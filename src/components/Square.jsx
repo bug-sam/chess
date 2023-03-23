@@ -8,7 +8,6 @@ const Square = (props) => {
         "bishup": "b",
         "queen": "q",
         "king": "k",
-        "": " "
     }
 
     const getColor = () => {
@@ -27,8 +26,8 @@ const Square = (props) => {
     };
 
     return (
-        <button className={getColor()} onClick={() => console.log(props.name)}>
-            {props.name}
+        <button className={getColor()} onClick={(e) => props.hc(props.piece, props.rank, props.file, props.name)}>
+            {props.piece ? pieces[props.piece.name] : ""}
         </button>
     )
 };
