@@ -27,7 +27,9 @@ const Square = (props) => {
 
     return (
         <button className={getColor()} onClick={(e) => props.hc(props)}>
-            {props.piece ? pieces[props.piece.name] : ""}
+            <span className={props.highlighted ? "dot" : ""}>
+                {props.piece ? pieces[props.piece.name] : ""}
+            </span>
         </button>
     )
 };

@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import getLegalMoves from "../lib/GameLogic";
 import Square from "./Square";
 import "../styles/Board.css"
 
@@ -59,12 +60,39 @@ const Board = (props) => {
         setSquares(s);
     };
 
+    const resetHighlights = () => {
+        let reset_board = squares.slice();
+        for (const square of reset_board) {
+            square.highlighted = false;
+        }
+    }
+
     const convertToFlatArray = (rank, file) => {
         return ((8 - file) * 8) + (rank - 1);
     };
 
     const handleClick = (square) => {
-        if (square.piece) {
+        resetHighlights();
+
+        if (selectedSquare) {
+            if (square.highlighted) {
+                // MOVING
+                console.log("moving " + selectedSquare.name + " to " + square.name);
+
+                const prev_square = convertToFlatArray(selectedSquare.rank, selectedSquare.file);
+                const new_square = convertToFlatArray(square.rank, square.file);
+
+                let updated_board = squares.slice();
+
+                updated_board[prev_square].piece = null;
+                updated_board[new_square].piece = selectedSquare.piece;
+
+                setSquares(updated_board);
+            }
+
+            setSelectedSquare(null);
+        }
+        else if (square.piece) {
             console.log(square.name + ": " + square.piece.color + " " + square.piece.name);
             if (square.piece.color === props.playing) {
                 setSelectedSquare({
@@ -73,25 +101,19 @@ const Board = (props) => {
                     file: square.file,
                     name: square.name,
                 })
-                // highlight legal moves
-                return;
+
+                const moves = getLegalMoves(square.piece, square.rank, square.file, squares);
+                console.log(moves);
+
+                let highlighted_board = squares.slice();
+
+                for (const move of moves) {
+                    const squareNum = convertToFlatArray(move.rank, move.file);
+                    highlighted_board[squareNum].highlighted = true;
+                }
+
+                setSquares(highlighted_board);
             }
-        }
-
-        // didn't click our own piece
-        if (selectedSquare) {
-            console.log("moving " + selectedSquare.name + " to " + square.name);
-
-            const prev_square = convertToFlatArray(selectedSquare.rank, selectedSquare.file);
-            const new_square = convertToFlatArray(square.rank, square.file);
-
-            let updated_board = squares.slice();
-
-            updated_board[prev_square].piece = null;
-            updated_board[new_square].piece = selectedSquare.piece;
-
-            setSquares(updated_board);
-            setSelectedSquare(null);
         }
     };
 
