@@ -4,7 +4,7 @@ import "../styles/Board.css"
 
 const Board = (props) => {
     const [squares, setSquares] = useState([]);
-    const [pieceToMove, setPieceToMove] = useState(null);
+    const [selectedSquare, setSelectedSquare] = useState(null);
 
     const setupBoard = () => {
         let s = [];
@@ -63,15 +63,15 @@ const Board = (props) => {
         return ((8 - file) * 8) + (rank - 1);
     };
 
-    const handleClick = (piece, rank, file, name) => {
-        if (piece) {
-            console.log(name + ": " + piece.color + " " + piece.name);
-            if (piece.color === props.playing) {
-                setPieceToMove({
-                    piece: piece,
-                    rank: rank,
-                    file: file,
-                    name: name,
+    const handleClick = (square) => {
+        if (square.piece) {
+            console.log(square.name + ": " + square.piece.color + " " + square.piece.name);
+            if (square.piece.color === props.playing) {
+                setSelectedSquare({
+                    piece: square.piece,
+                    rank: square.rank,
+                    file: square.file,
+                    name: square.name,
                 })
                 // highlight legal moves
                 return;
@@ -79,26 +79,26 @@ const Board = (props) => {
         }
 
         // didn't click our own piece
-        if (pieceToMove) {
-            console.log("moving " + pieceToMove.name + " to " + name);
+        if (selectedSquare) {
+            console.log("moving " + selectedSquare.name + " to " + square.name);
 
-            const prev_square = convertToFlatArray(pieceToMove.rank, pieceToMove.file);
-            const new_square = convertToFlatArray(rank, file);
+            const prev_square = convertToFlatArray(selectedSquare.rank, selectedSquare.file);
+            const new_square = convertToFlatArray(square.rank, square.file);
 
             let updated_board = squares.slice();
 
             updated_board[prev_square].piece = null;
-            updated_board[new_square].piece = pieceToMove.piece;
+            updated_board[new_square].piece = selectedSquare.piece;
 
             setSquares(updated_board);
-            setPieceToMove(null);
+            setSelectedSquare(null);
         }
     };
 
     useEffect(setupBoard, []);
 
     return (
-        <div className="board">
+        <div className={"board " + props.playing}>
             {squares.map((s) => {
                 return (
                     <Square key={s.name} name={s.name} rank={s.rank} file={s.file} piece={s.piece} highlighted={s.highlighted} hc={handleClick}>
